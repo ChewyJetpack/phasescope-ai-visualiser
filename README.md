@@ -6,7 +6,7 @@ This repo is for an openFrameworks sketch that takes an audio file and some imag
 
 Here is a full description of exactly what this sketch should do:
 
-1. Take an audio file, a directory of png files, and an integer for tempo (in beats per minute) as an input
+1. Take an audio file (which may vary in duration from 10 seconds to 10 minutes), a directory of png files, and an integer for tempo (in beats per minute) as an input
 2. Before drawing anything, analyse the images for luminance and store a map of the luminance of the image
 3. Create a 1920x1080 canvas for displaying anythign that is drawn
 4. Draw an audio phase correlation meter [like this one](https://images.squarespace-cdn.com/content/v1/61362d681567f64bc6563ba1/e9b8e575-1264-41f4-92e7-71d2be395ba1/PCM-gif.gif?format=750w0), that displays a continuous line on a quadrilateral plot, illustrating the difference between the left and right channels
@@ -33,7 +33,9 @@ While the openFrameworks sketch is based on the Processing sketch, it does not n
 
 ## System and performance requirements
 
-All code should run on Visual Studio 2017 in Windows 11. Any libraries used should be compatible with this.
+All code should run on Visual Studio 2017 in Windows 11. Any libraries used should be compatible with this. The target platform is Windows.
+
+The specific openFrameworks version used is 0.11.2 (of_v0.11.2_vs2017_release).
 
 In terms of performance, the sketch should be able to run in realtime at a minimum of 30fps. It should be at least 3x more efficient on hardware resources than the Processing sketch.
 
