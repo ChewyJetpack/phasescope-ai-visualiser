@@ -21,4 +21,7 @@ Here is a full description of exactly what this sketch should do:
 
 ## Additional information
 
+The full Visual Studio 2017 Sketch folder is called [mySketch](https://github.com/ChewyJetpack/phasescope-ai-visualiser/tree/main/mySketch)
+
 This code is directly based on a previous sketch that was written in Processing: [Here is a link to the Processing sketch](https://github.com/ChewyJetpack/phasescope-ai-visualiser/blob/main/processing/sketch).
+
