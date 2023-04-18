@@ -21,7 +21,22 @@ Here is a full description of exactly what this sketch should do:
 
 ## Additional information
 
-The full Visual Studio 2017 Sketch folder is called [mySketch](https://github.com/ChewyJetpack/phasescope-ai-visualiser/tree/main/mySketch)
+This code is directly based on a previous sketch that was written in Processing. [Here is the code for the Processing sketch](https://github.com/ChewyJetpack/phasescope-ai-visualiser/raw/main/processing/sketch)
 
-This code is directly based on a previous sketch that was written in Processing: [Here is a link to the Processing sketch](https://github.com/ChewyJetpack/phasescope-ai-visualiser/blob/main/processing/sketch).
+Here is the main.cpp file from the openFrameworks sketch: https://raw.githubusercontent.com/ChewyJetpack/phasescope-ai-visualiser/main/mySketch/src/main.cpp
 
+Here is the ofApp.cpp file from the openFrameworks sketch: https://raw.githubusercontent.com/ChewyJetpack/phasescope-ai-visualiser/main/mySketch/src/ofApp.cpp
+
+Here is the ofApp.h file from the openFrameworks sketch: https://raw.githubusercontent.com/ChewyJetpack/phasescope-ai-visualiser/main/mySketch/src/ofApp.h
+
+While the openFrameworks sketch is based on the Processing sketch, it does not need to be a direct recreation. The most important aspect of the Processing sketch to be adhered to is the phase scope, in terms of its dimensions, appearance, and functionality, though enhancements and changes to this will be made throughout the process.
+
+## System and performance requirements
+
+All code should run on Visual Studio 2017 in Windows 11. Any libraries used should be compatible with this.
+
+In terms of performance, the sketch should be able to run in realtime at a minimum of 30fps. It should be at least 3x more efficient on hardware resources than the Processing sketch.
+
+## Coding style
+
+The code should use clear and descriptive naming conventions, and should be thoroughly commented so that it is easily understandable to human engineers.
