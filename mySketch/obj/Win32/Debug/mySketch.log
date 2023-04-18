@@ -1,0 +1,15 @@
+﻿  main.cpp
+  ofApp.cpp
+  Info: Boost.Config is older than your compiler version - probably nothing bad will happen - but you may wish to look for an update Boost version.  Define BOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE to suppress this message.
+  Info: Boost.Config is older than your compiler version - probably nothing bad will happen - but you may wish to look for an update Boost version.  Define BOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE to suppress this message.
+c:\users\chewy\documents\of_v0.11.2_vs2017_release\apps\myapps\mysketch\src\ofapp.cpp(22): warning C4996: 'ofSoundStream::setup': Use an ofSoundStreamSettings object instead of directly passing the parameters
+  c:\users\chewy\documents\of_v0.11.2_vs2017_release\libs\openframeworks\sound\ofsoundstream.h(120): note: see declaration of 'ofSoundStream::setup'
+c:\users\chewy\documents\of_v0.11.2_vs2017_release\apps\myapps\mysketch\src\ofapp.cpp(32): error C2039: 'update': is not a member of 'ofSoundPlayer'
+  c:\users\chewy\documents\of_v0.11.2_vs2017_release\libs\openframeworks\sound\ofsoundplayer.h(72): note: see declaration of 'ofSoundPlayer'
+c:\users\chewy\documents\of_v0.11.2_vs2017_release\apps\myapps\mysketch\src\ofapp.cpp(33): error C2039: 'getSoundBuffer': is not a member of 'ofSoundPlayer'
+  c:\users\chewy\documents\of_v0.11.2_vs2017_release\libs\openframeworks\sound\ofsoundplayer.h(72): note: see declaration of 'ofSoundPlayer'
+c:\users\chewy\documents\of_v0.11.2_vs2017_release\apps\myapps\mysketch\src\ofapp.cpp(34): error C2039: 'getFFT': is not a member of 'ofSoundBuffer'
+  c:\users\chewy\documents\of_v0.11.2_vs2017_release\libs\openframeworks\sound\ofsoundbuffer.h(84): note: see declaration of 'ofSoundBuffer'
+c:\users\chewy\documents\of_v0.11.2_vs2017_release\apps\myapps\mysketch\src\ofapp.cpp(71): error C2039: 'getFFT': is not a member of 'ofSoundBuffer'
+  c:\users\chewy\documents\of_v0.11.2_vs2017_release\libs\openframeworks\sound\ofsoundbuffer.h(84): note: see declaration of 'ofSoundBuffer'
+c:\users\chewy\documents\of_v0.11.2_vs2017_release\apps\myapps\mysketch\src\ofapp.cpp(85): warning C4018: '<': signed/unsigned mismatch
