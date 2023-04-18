@@ -1,0 +1,267 @@
+import com.hamoid.*;
+import ddf.minim.*;
+import ddf.minim.analysis.*;
+import java.io.File;
+import processing.opengl.*;
+
+Minim minim;
+AudioPlayer audioFile;
+FFT fft;
+LowPassFilter lowPassFilter;
+
+float threshold = 0.95;
+
+PImage currentFrame;
+boolean isPeakFrame;
+ArrayList<PVector> curvePoints = new ArrayList<PVector>();
+boolean isFirstFrame = true;
+int fadeStartTime = 0;
+PImage lastMaskedImage;
+
+int fadeOutDuration = 1000;
+int remainingFadeOutTime = 0;
+PShape displayedShape;
+float shapeAlpha;
+
+PImage[] images;
+PShape[] shapes;
+
+PImage prevFrame;
+float blendAmount = 0.5;
+
+VideoExport videoExport;
+
+PGraphics backgroundGraphics;
+PGraphics shapeGraphics;
+
+class LowPassFilter implements AudioEffect {
+  float alpha;
+  float prevLeft;
+  float prevRight;
+
+  LowPassFilter(float cutoffFreq, float sampleRate) {
+    alpha = exp(-2 * PI * cutoffFreq / sampleRate);
+    prevLeft = 0;
+    prevRight = 0;
+  }
+
+  void process(float[] left, float[] right) {
+    for (int i = 0; i < left.length; i++) {
+      left[i] = left[i] * (1 - alpha) + prevLeft * alpha;
+      right[i] = right[i] * (1 - alpha) + prevRight * alpha;
+      prevLeft = left[i];
+      prevRight = right[i];
+    }
+  }
+
+  void process(float[] signal) {}
+}
+
+void setup() {
+  size(1920, 1080, P2D);
+
+  minim = new Minim(this);
+  audioFile = minim.loadFile("your_audio_file.wav");
+  fft = new FFT(audioFile.bufferSize(), audioFile.sampleRate());
+
+  float cutoffFreq = 1500;
+  lowPassFilter = new LowPassFilter(cutoffFreq, audioFile.sampleRate());
+  audioFile.addEffect(lowPassFilter);
+  audioFile.play();
+
+  String folderPath = "F:\\PROJECTS\\sketch_230410a\\images/";
+  String[] imageFilenames = listFileNames(folderPath);
+  if (imageFilenames == null) {
+    println("Error: Could not load image files");
+    exit();
+  } else {
+    images = new PImage[imageFilenames.length];
+    for (int i = 0; i < imageFilenames.length; i++) {
+      images[i] = loadImage(folderPath + imageFilenames[i]);
+      if (images[i] == null) {
+        println("Error: Could not load image " + imageFilenames[i]);
+        exit();
+      }
+    }
+  }
+  shapes = new PShape[imageFilenames.length];
+  for (int i = 0; i < imageFilenames.length; i++) {
+    shapes[i] = imageToShape(images[i], 40);
+  }
+
+  videoExport = new VideoExport(this, "output.mp4");
+  videoExport.setFrameRate(30);
+  videoExport.startMovie();
+
+  // Create PGraphics objects for background and shapes
+  backgroundGraphics = createGraphics(width, height);
+  shapeGraphics = createGraphics(width, height);
+}
+
+int gridSize = 60;
+
+void drawBackground(PGraphics canvas) {
+  canvas.pushStyle();
+
+  canvas.stroke(color(#5B5B5B));
+  canvas.strokeWeight(1);
+  for (int y = 0; y <= canvas.height; y += gridSize) {
+    canvas.line(0, y, canvas.width, y);
+  }
+  for (int x = 0; x <= canvas.width; x += gridSize) {
+    canvas.line(x, 0, x, canvas.height);
+  }
+
+  canvas.pushMatrix();
+  canvas.translate(canvas.width / 2, canvas.height / 2);
+  canvas.rotate(radians(45));
+  canvas.fill(color(#0F0C11));
+  canvas.stroke(color(#5B5B5B));
+  canvas.rectMode(CENTER);
+  canvas.rect(0, 0, 700, 700);
+  canvas.popMatrix();
+
+  canvas.popStyle();
+}
+PShape imageToShape(PImage img, float threshold) {
+  PShape shape = createShape();
+  shape.beginShape(POINTS);
+  shape.noFill();
+  img.loadPixels();
+
+  int centerX = img.width / 2;
+  int centerY = img.height / 2;
+
+  for (int y = 0; y < img.height; y++) {
+    for (int x = 0; x < img.width; x++) {
+      int index = x + y * img.width;
+      color c = img.pixels[index];
+      float val = brightness(c);
+
+      if (val > threshold) {
+        shape.vertex(x - centerX, y - centerY);
+      }
+    }
+  }
+
+  shape.endShape();
+  return shape;
+}
+
+String[] listFileNames(String dir) {
+  File file = new File(dir);
+  if (file.isDirectory()) {
+    String[] names = file.list();
+    return names;
+  } else {
+    return null;
+  }
+}
+
+
+void draw() {
+  float frameRate = 30.0;
+  float frameDuration = 1000.0 / frameRate;
+  int totalFrames = int(audioFile.length() / frameDuration);
+
+  for (int currentFrame = 0; currentFrame < totalFrames; currentFrame++) {
+    
+      println("exporting frame "+ currentFrame +" of "+ totalFrames);
+    float audioPosition = currentFrame * frameDuration;
+    audioFile.cue(int(audioPosition));
+
+    fft.forward(audioFile.mix);
+  curvePoints.clear();
+
+  int lowerBin = fft.freqToIndex(100);
+  int upperBin = fft.freqToIndex(700);
+  float avg = 0;
+  for (int i = 0; i < audioFile.bufferSize() / 1.5 - 1; i += 1.5) {
+    avg += fft.getBand(i);
+  }
+  avg /= (upperBin - lowerBin + 1);
+  avg /= 100;
+  isPeakFrame = avg >= threshold;
+
+  // Draw background and shapes in separate PGraphics objects
+  backgroundGraphics.beginDraw();
+  backgroundGraphics.background(color(#0F0C11));
+  drawBackground(backgroundGraphics);
+  backgroundGraphics.endDraw();
+
+  shapeGraphics.beginDraw();
+  shapeGraphics.clear();
+
+  if (!isPeakFrame) {
+    shapeGraphics.pushMatrix();
+    shapeGraphics.translate(width/2, height/2);
+    shapeGraphics.stroke(color(#FFFCE0));
+    shapeGraphics.strokeWeight(2);
+    shapeGraphics.noFill();
+    shapeGraphics.beginShape();
+    for (int i = 0; i < audioFile.bufferSize() - 1; i++) {
+      float leftChannel = audioFile.left.get(i);
+      float rightChannel = audioFile.right.get(i);
+
+      float x = map(leftChannel - rightChannel, -1, 1, -450, 450);
+      float y = map(leftChannel + rightChannel, -2, 2, 450, -450);
+      shapeGraphics.curveVertex(x, y);
+      curvePoints.add(new PVector(x, y));
+    }
+    shapeGraphics.endShape();
+    shapeGraphics.popMatrix();
+  }
+
+  if (isPeakFrame) {
+    displayedShape = shapes[int(random(shapes.length))];
+    fadeStartTime = millis();
+  }
+
+  if (displayedShape != null) {
+    int elapsedTime = millis() - fadeStartTime;
+    if (elapsedTime < fadeOutDuration) {
+      float fadeProgress = float(elapsedTime) / float(fadeOutDuration);
+      shapeAlpha = map(fadeProgress, 0, 1, 255, 0);
+    } else {
+      shapeAlpha = 255;
+      displayedShape = null;
+    }
+
+    if (displayedShape != null) {
+      float scaleFactor = lerp(0.6, 0.9, 1 - shapeAlpha / 255);
+      displayedShape.setFill(false);
+      displayedShape.setStroke(color(191, 141, 255, shapeAlpha));
+
+      shapeGraphics.pushMatrix();
+      shapeGraphics.translate(width/2, height/2);
+      shapeGraphics.scale(scaleFactor);
+      shapeGraphics.strokeWeight(1);
+
+      shapeGraphics.shape(displayedShape, 0, 0);
+      shapeGraphics.popMatrix();
+    }
+  }
+
+  shapeGraphics.endDraw();
+
+  filter(BLUR, 2);
+  // Combine background and shapes with blendMode
+  image(backgroundGraphics, 0, 0);
+  blendMode(LIGHTEST);
+  image(shapeGraphics, 0, 0);
+  blendMode(BLEND);
+
+  videoExport.saveFrame();
+    }
+
+
+    stop();
+
+}
+
+void stop() {
+  audioFile.close();
+  minim.stop();
+  videoExport.endMovie();
+  super.stop();
+}
