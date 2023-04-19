@@ -2,39 +2,52 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxAudioAnalyzer.h"
+#include "ofxVideoRecorder.h"
 
 class ofApp : public ofBaseApp {
 public:
 	void setup();
 	void update();
 	void draw();
+
 	void audioIn(ofSoundBuffer &input);
 	void exit();
-	void loadImages();
-	ofPath imageToPath(ofImage image, float threshold);
 
-	ofSoundPlayer audioFile;
 	ofSoundStream soundStream;
+	ofxAudioAnalyzer audioAnalyzer;
 	ofSoundBuffer soundBuffer;
-	vector<float> fftBins;
-	int fftSize;
+
+	float rms, pitch, peakFrequency;
+	bool transientDetected;
+	float transientThreshold;
+
 	int bufferSize;
+	int sampleRate;
 
-	float threshold;
-	ofImage currentFrame;
-	bool isPeakFrame;
-	vector<ofVec2f> curvePoints;
-	bool isFirstFrame;
-	int fadeStartTime;
-	ofImage lastMaskedImage;
-	int fadeOutDuration;
-	int remainingFadeOutTime;
-	ofPath displayedPath;
-	float pathAlpha;
 	vector<ofImage> images;
-	vector<ofPath> paths;
+	int currentImageIndex;
+	int numImages;
+	float imageThreshold;
 
-	ofFbo backgroundFbo;
-	ofFbo shapeFbo;
+	ofFbo fbo;
+	ofPixels pixels;
+	ofxVideoRecorder recorder;
 
+	float tempo;
+	float timeBetweenPeaks;
+	float lastPeakTime;
+
+	bool displayPeak;
+
+	void loadImages(string dirPath);
+	void analyzeImages();
+	vector<vector<float>> imageLuminanceMaps;
+
+	void drawPhaseScope();
+	void drawImageTrace();
+
+	ofRectangle scopeRect;
+
+	bool renderingVideo;
 };
